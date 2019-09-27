@@ -615,22 +615,26 @@ def main():
         pwm_path = "{}/pwm_{}".format(opts.motor,pwm)
         if not os.path.exists(pwm_path):
             os.mkdir(pwm_path)
+        mavl.mav_arm() #Unfortunately, we need to arm before we spinup, otherwise preflight checks will fail.
         motorpwm.set_pwm(pwm)
         sleep(5.0) #Give it some time to ramp up and stabilize
         start_time = time()
-        mavl.mav_arm()
         mavl.start_vibration_log("{}/{}".format(pwm_path,"vibe.mavlink.csv"))
         while ((time() - start_time)) < opts.runtime:
             sleep(0.5)
-        mavl.mav_disarm()
         mavl.stop_vibration_log()
+        mavl.mav_disarm()
         motorpwm.set_pwm(900000)
+        #Store latest log number to a file for later extraction of sd card (since download of mavlink can take a LOOOONNNNGGG time.
+        mavl.px4_log_reset()
+        mavl.mav_download_px4_log_list()
+        while mavl.download_last_log_num == -1:
+            sleep(2)
+        lognum_fd = open("{}/lognum.txt".format(pwm_path),'w')
+        lognum_fd.write(int(mavl.download_last_log_num))
+        lognum_fd.close()
         #Download corresponding px4 log
         if opts.download_logs:
-            mavl.px4_log_reset()
-            mavl.mav_download_px4_log_list()
-            while mavl.download_last_log_num == -1:
-                sleep(1)
             mavl.mav_download_px4_log_latest("{}/{}".format(pwm_path,"log.ulg"))
             while mavl.download_filename is not None:
                 sleep(5) #Logs can take a long time to download: Give a good sleep to let the mavl runtime thread do it's business
