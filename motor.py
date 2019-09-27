@@ -631,7 +631,7 @@ def main():
         while mavl.download_last_log_num == -1:
             sleep(2)
         lognum_fd = open("{}/lognum.txt".format(pwm_path),'w')
-        lognum_fd.write(int(mavl.download_last_log_num))
+        lognum_fd.write(str(mavl.download_last_log_num))
         lognum_fd.close()
         #Download corresponding px4 log
         if opts.download_logs:
