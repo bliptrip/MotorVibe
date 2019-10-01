@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 import sys
 
-re_pwm = re.compile(r'.*pwm_([0-9]+)_.*') #For determining the pwm value from the file path
+re_pwm = re.compile(r'.*pwm_([0-9]+).*') #For determining the pwm value from the file path
 #re_props = re.compile(r'.*\.props\..*') #For matching whether we are looking at motors with or without props
 re_accelerometer = re.compile(r'vibe_([xyzXYZ])')
 
@@ -18,7 +18,7 @@ def parse_args():
     parser = ArgumentParser(description='Filter out accelerometer data between a pair of motors from ulg files, writing comparative output to csv file.')
     parser.add_argument('-o', '--output', dest='output', required=True, help='CSV filename to dump statistics to.')
     parser.add_argument('-m', '--map', dest='map',
-            help="Dictionary containing a map of first motor's pwm to another equivalent pwm (to compare approximately the same RPM value)",
+            help="Dictionary containing a map of first motor's pwm to another equivalent pwm (to compare approximately the same RPM value) -- keys are from motor1, values are equivalent for motor2",
             default="{1300000:1163158,1400000:1252632,1500000:1342105,1600000:1431579,1700000:1521053,1800000:1610526,1900000:1700000}")
     parser.add_argument('--motor1', dest='motor1', help='Name of motor 1', default='sunnysky')
     parser.add_argument('--motor2', dest='motor2', help='Name of motor 2.', default='tmotor')
@@ -98,4 +98,4 @@ if __name__ == "__main__":
             dmin = np.min(raw_df[k])
             pdf.loc[ (pdf['axis'] == axis) & (pdf['stat'] == 'min') & (pdf['props'] == props) & (pdf['RPM_class'] == rpm_class), accel_fieldname ] = dmin
             pdf.loc[ (pdf['axis'] == axis) & (pdf['stat'] == 'min') & (pdf['props'] == props) & (pdf['RPM_class'] == rpm_class), "{}_pwm".format(motor_name) ] = pwm
-    pdf.to_csv(parsed.output)
+    pdf.to_csv(parsed.output, index=False)
