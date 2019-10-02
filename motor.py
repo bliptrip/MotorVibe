@@ -602,6 +602,11 @@ def main():
     motorpwm = MotorPWMDriver(opts.pwmchip, opts.pwmchan, opts.pwmperiod)
 
     mavl.mav_drop_throttle()
+    sleep(5.0)
+    mavl.mav_drop_throttle()
+    sleep(5.0)
+    mavl.mav_drop_throttle()
+    sleep(5.0)
 
     motorpwm.set_pwm(900000)
     
@@ -615,8 +620,8 @@ def main():
         pwm_path = "{}/pwm_{}".format(opts.motor,pwm)
         if not os.path.exists(pwm_path):
             os.mkdir(pwm_path)
-        mavl.mav_arm() #Unfortunately, we need to arm before we spinup, otherwise preflight checks will fail.
         motorpwm.set_pwm(pwm)
+        mavl.mav_arm() #Unfortunately, we need to arm before we spinup, otherwise preflight checks will fail.
         sleep(5.0) #Give it some time to ramp up and stabilize
         start_time = time()
         mavl.start_vibration_log("{}/{}".format(pwm_path,"vibe.mavlink.csv"))
@@ -625,6 +630,7 @@ def main():
         mavl.stop_vibration_log()
         mavl.mav_disarm()
         motorpwm.set_pwm(900000)
+        sleep(5.0)
         #Store latest log number to a file for later extraction of sd card (since download of mavlink can take a LOOOONNNNGGG time.
         mavl.px4_log_reset()
         mavl.mav_download_px4_log_list()
