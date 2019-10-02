@@ -20,3 +20,9 @@ tmotor:
 tmotorprop:
 	mkdir -p $(LOGFOLDER).props
 	cd $(LOGFOLDER).props && ../motor.py --master=$(MASTER) --source-system=253 --input=../config/tmotor.txt --pwmchip=/sys/class/pwm/pwmchip0 --pwmchan=0 --motor "tmotor_mn505s_380kv" --runtime 30
+
+plot_vibrations:
+	cd $(LOGFOLDER) && ../plot_vibrations.py -o output.html
+
+plot_vibrationsprop:
+	cd $(LOGFOLDER).props && ../plot_vibrations.py -o output.html
